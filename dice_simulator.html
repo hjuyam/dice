@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>掷骰子模拟器</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Arial', sans-serif;
+            box-sizing: border-box;
+        }
+
+        .container {
+            text-align: center;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        h1 {
+            color: white;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .settings {
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .settings label {
+            color: white;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .settings select {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 8px 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .settings select:hover {
+            background: white;
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .display {
+            width: 180px;
+            height: 180px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 5px solid white;
+        }
+
+        .number {
+            font-size: 4rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+            user-select: none;
+        }
+
+        .control-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            border: none;
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+            width: 100%;
+            max-width: 200px;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.6);
+        }
+
+        .control-btn:active {
+            transform: translateY(0);
+        }
+
+        .status {
+            margin-top: 20px;
+            color: white;
+            font-size: 1rem;
+            opacity: 0.8;
+            min-height: 25px;
+        }
+
+        .switching {
+            animation: pulse 0.05s infinite alternate;
+        }
+
+        .stopped {
+            animation: celebrate 0.5s ease-out;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.05); }
+        }
+
+        @keyframes celebrate {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* 移动端优化 */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+                margin-bottom: 20px;
+            }
+            
+            .display {
+                width: 150px;
+                height: 150px;
+                margin-bottom: 25px;
+            }
+            
+            .number {
+                font-size: 3rem;
+            }
+            
+            .control-btn {
+                padding: 12px 30px;
+                font-size: 1.1rem;
+            }
+            
+            .settings {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .settings select {
+                padding: 10px 15px;
+            }
+        }
+
+        @media (max-width: 320px) {
+            .display {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .number {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎲 掷骰子模拟器</h1>
+        
+        <div class="settings">
+            <label for="maxNumber">最高点数:</label>
+            <select id="maxNumber" onchange="updateMaxNumber()">
+                <option value="3" selected>3点</option>
+                <option value="4">4点</option>
+                <option value="5">5点</option>
+                <option value="6">6点</option>
+                <option value="8">8点</option>
+                <option value="10">10点</option>
+                <option value="12">12点</option>
+                <option value="20">20点</option>
+            </select>
+        </div>
+        
+        <div class="display" id="display">
+            <div class="number" id="number">1</div>
+        </div>
+
+        <button class="control-btn" id="controlBtn" onclick="toggleSwitch()">
+            停止
+        </button>
+
+        <div class="status" id="status">数字正在快速切换中...</div>
+    </div>
+
+    <script>
+        let isSwitching = true;
+        let switchInterval;
+        let stopTimeout;
+        let maxNumber = 3;
+
+        function updateMaxNumber() {
+            const selectElement = document.getElementById('maxNumber');
+            maxNumber = parseInt(selectElement.value);
+            
+            // 如果当前在切换状态，重新开始以应用新的最大值
+            if (isSwitching) {
+                clearInterval(switchInterval);
+                startSwitching();
+            }
+        }
+
+        function startSwitching() {
+            const numberElement = document.getElementById('number');
+            const displayElement = document.getElementById('display');
+            
+            displayElement.classList.add('switching');
+            
+            switchInterval = setInterval(() => {
+                const randomNum = Math.floor(Math.random() * maxNumber) + 1;
+                numberElement.textContent = randomNum;
+            }, 50); // 速度提高一倍：从100ms改为50ms
+        }
+
+        function stopSwitching() {
+            const displayElement = document.getElementById('display');
+            const numberElement = document.getElementById('number');
+            
+            clearInterval(switchInterval);
+            displayElement.classList.remove('switching');
+            displayElement.classList.add('stopped');
+            
+            // 最终随机选择一个数字
+            const finalNumber = Math.floor(Math.random() * maxNumber) + 1;
+            numberElement.textContent = finalNumber;
+            
+            // 移除庆祝动画
+            setTimeout(() => {
+                displayElement.classList.remove('stopped');
+            }, 500);
+        }
+
+        function toggleSwitch() {
+            const controlBtn = document.getElementById('controlBtn');
+            const status = document.getElementById('status');
+
+            if (isSwitching) {
+                // 当前在切换，点击后停止
+                stopSwitching();
+                controlBtn.textContent = '开始';
+                status.textContent = '已停止！3秒后自动开始切换...';
+                isSwitching = false;
+
+                // 3秒后自动开始切换
+                stopTimeout = setTimeout(() => {
+                    startSwitching();
+                    controlBtn.textContent = '停止';
+                    status.textContent = '数字正在快速切换中...';
+                    isSwitching = true;
+                }, 3000);
+            } else {
+                // 当前已停止，点击后立即开始
+                clearTimeout(stopTimeout);
+                startSwitching();
+                controlBtn.textContent = '停止';
+                status.textContent = '数字正在快速切换中...';
+                isSwitching = true;
+            }
+        }
+
+        // 页面加载时开始切换
+        document.addEventListener('DOMContentLoaded', function() {
+            startSwitching();
+        });
+    </script>
+</body>
+</html>
